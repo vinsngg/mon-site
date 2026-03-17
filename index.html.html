@@ -1,0 +1,2048 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexara Studio — Design & Innovation Numérique</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --noir: #0a0a0a;
+      --blanc: #f5f0e8;
+      --or: #c8a96e;
+      --or-clair: #e8d5a3;
+      --gris: #2a2a2a;
+      --gris-clair: #4a4a4a;
+      --accent: #d4614e;
+      --vert: #3a6b4a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--noir);
+      color: var(--blanc);
+      overflow-x: hidden;
+    }
+
+    /* ===== CURSEUR PERSONNALISÉ ===== */
+    body { cursor: none; }
+    #cursor {
+      position: fixed;
+      width: 12px; height: 12px;
+      background: var(--or);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width .2s, height .2s, background .2s;
+      mix-blend-mode: difference;
+    }
+    #cursor-trail {
+      position: fixed;
+      width: 36px; height: 36px;
+      border: 1px solid var(--or);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: left .12s ease-out, top .12s ease-out;
+      opacity: 0.5;
+    }
+    a:hover ~ #cursor, button:hover ~ #cursor { width: 24px; height: 24px; }
+
+    /* ===== NAVIGATION ===== */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 60px;
+      transition: all .4s;
+    }
+    nav.scrolled {
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(20px);
+      padding: 16px 60px;
+      border-bottom: 1px solid rgba(200,169,110,0.2);
+    }
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      color: var(--blanc);
+      text-decoration: none;
+    }
+    .logo span { color: var(--or); }
+
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: rgba(245,240,232,0.7);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 400;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      transition: color .3s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 1px;
+      background: var(--or);
+      transition: width .3s;
+    }
+    .nav-links a:hover { color: var(--or); }
+    .nav-links a:hover::after { width: 100%; }
+
+    .nav-cta {
+      border: 1px solid var(--or);
+      color: var(--or) !important;
+      padding: 10px 24px;
+      border-radius: 2px;
+      transition: all .3s !important;
+    }
+    .nav-cta:hover { background: var(--or); color: var(--noir) !important; }
+    .nav-cta::after { display: none !important; }
+
+    /* Hamburger mobile */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+    }
+    .hamburger span {
+      display: block;
+      width: 24px; height: 2px;
+      background: var(--blanc);
+      transition: all .3s;
+    }
+
+    /* Menu mobile */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--noir);
+      z-index: 999;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 40px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      color: var(--blanc);
+      text-decoration: none;
+      transition: color .3s;
+    }
+    .mobile-menu a:hover { color: var(--or); }
+    .close-menu {
+      position: absolute;
+      top: 30px; right: 40px;
+      font-size: 32px;
+      background: none; border: none;
+      color: var(--blanc);
+      cursor: pointer;
+    }
+
+    /* ===== HERO ===== */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding: 0 60px;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 60% at 80% 50%, rgba(200,169,110,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(212,97,78,0.06) 0%, transparent 50%);
+    }
+
+    .hero-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(200,169,110,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,169,110,0.05) 1px, transparent 1px);
+      background-size: 80px 80px;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 800px;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--or);
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp .8s .2s forwards;
+    }
+    .hero-tag::before {
+      content: '';
+      display: block;
+      width: 40px; height: 1px;
+      background: var(--or);
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(54px, 8vw, 100px);
+      line-height: 0.95;
+      font-weight: 900;
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp .8s .4s forwards;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--or);
+    }
+
+    .hero-desc {
+      font-size: 18px;
+      line-height: 1.7;
+      color: rgba(245,240,232,0.65);
+      max-width: 520px;
+      margin-bottom: 52px;
+      opacity: 0;
+      animation: fadeUp .8s .6s forwards;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      opacity: 0;
+      animation: fadeUp .8s .8s forwards;
+    }
+
+    .btn-primary {
+      background: var(--or);
+      color: var(--noir);
+      padding: 18px 40px;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all .3s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--blanc);
+      transform: translateX(-100%);
+      transition: transform .3s;
+    }
+    .btn-primary:hover::before { transform: translateX(0); }
+    .btn-primary span { position: relative; z-index: 1; }
+
+    .btn-outline {
+      color: var(--blanc);
+      font-size: 14px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: color .3s;
+    }
+    .btn-outline:hover { color: var(--or); }
+    .btn-outline svg { transition: transform .3s; }
+    .btn-outline:hover svg { transform: translateX(6px); }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 40px; left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      animation: fadeIn 1s 1.2s forwards;
+    }
+    .hero-scroll span {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.4);
+    }
+    .scroll-line {
+      width: 1px; height: 60px;
+      background: linear-gradient(to bottom, var(--or), transparent);
+      animation: scrollDrop 2s infinite;
+    }
+
+    /* Chiffres flottants */
+    .hero-stats {
+      position: absolute;
+      right: 60px; top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      opacity: 0;
+      animation: fadeIn 1s 1s forwards;
+    }
+    .hero-stat {
+      text-align: right;
+      border-right: 2px solid var(--or);
+      padding-right: 24px;
+    }
+    .hero-stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--or);
+      line-height: 1;
+    }
+    .hero-stat-label {
+      font-size: 12px;
+      color: rgba(245,240,232,0.5);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* ===== TICKER ===== */
+    .ticker {
+      background: var(--or);
+      padding: 16px 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .ticker-track {
+      display: inline-flex;
+      animation: ticker 25s linear infinite;
+    }
+    .ticker-item {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--noir);
+      padding: 0 40px;
+    }
+    .ticker-dot {
+      color: var(--gris);
+      font-size: 20px;
+      vertical-align: middle;
+      padding: 0 10px;
+    }
+
+    /* ===== SECTIONS COMMUNES ===== */
+    section { padding: 120px 60px; }
+
+    .section-tag {
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--or);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .section-tag::before {
+      content: '';
+      display: block;
+      width: 40px; height: 1px;
+      background: var(--or);
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(38px, 5vw, 64px);
+      line-height: 1.05;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+
+    /* ===== À PROPOS ===== */
+    #about {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 100px;
+      align-items: center;
+    }
+
+    .about-visual {
+      position: relative;
+      aspect-ratio: 4/5;
+    }
+    .about-visual-main {
+      width: 75%;
+      aspect-ratio: 3/4;
+      background: var(--gris);
+      position: absolute;
+      top: 0; left: 0;
+      overflow: hidden;
+    }
+    .about-visual-main::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(200,169,110,0.3) 0%, transparent 60%);
+    }
+    .about-photo-placeholder {
+      width: 100%; height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+      font-family: 'Playfair Display', serif;
+      font-size: 80px;
+      color: rgba(200,169,110,0.15);
+    }
+    .about-visual-accent {
+      width: 55%;
+      aspect-ratio: 1;
+      background: var(--or);
+      position: absolute;
+      bottom: 0; right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .about-years {
+      text-align: center;
+    }
+    .about-years-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 72px;
+      font-weight: 900;
+      color: var(--noir);
+      line-height: 1;
+    }
+    .about-years-label {
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gris);
+    }
+
+    .about-text p {
+      font-size: 17px;
+      line-height: 1.8;
+      color: rgba(245,240,232,0.7);
+      margin-bottom: 24px;
+    }
+
+    .about-values {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .about-value {
+      padding: 24px;
+      border: 1px solid rgba(200,169,110,0.2);
+      transition: border-color .3s;
+    }
+    .about-value:hover { border-color: var(--or); }
+    .about-value-icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+    .about-value h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+    .about-value p {
+      font-size: 14px;
+      color: rgba(245,240,232,0.55);
+      margin: 0 !important;
+    }
+
+    /* ===== SERVICES ===== */
+    #services { background: var(--gris); }
+
+    .services-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 80px;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+
+    .service-card {
+      background: var(--noir);
+      padding: 52px 40px;
+      position: relative;
+      overflow: hidden;
+      transition: all .4s;
+      cursor: pointer;
+    }
+    .service-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 0;
+      background: var(--or);
+      transition: height .4s;
+    }
+    .service-card:hover::before { height: 4px; }
+    .service-card:hover { transform: translateY(-4px); }
+
+    .service-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 72px;
+      font-weight: 700;
+      color: rgba(200,169,110,0.12);
+      line-height: 1;
+      margin-bottom: 24px;
+    }
+    .service-icon {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+    .service-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .service-card p {
+      font-size: 15px;
+      color: rgba(245,240,232,0.6);
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+    .service-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .service-tag {
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--or);
+      border: 1px solid rgba(200,169,110,0.3);
+      padding: 5px 12px;
+    }
+
+    /* ===== RÉALISATIONS ===== */
+    #portfolio { padding-bottom: 0; }
+
+    .portfolio-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 60px;
+    }
+
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 4px;
+    }
+
+    .portfolio-item {
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .portfolio-item:first-child { grid-row: span 2; }
+
+    .portfolio-thumb {
+      width: 100%;
+      aspect-ratio: 4/3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 60px;
+      transition: transform .6s;
+    }
+    .portfolio-item:first-child .portfolio-thumb { aspect-ratio: 3/4; }
+
+    .portfolio-item:nth-child(1) .portfolio-thumb { background: linear-gradient(135deg, #1a2a1a, #2a4a2a); }
+    .portfolio-item:nth-child(2) .portfolio-thumb { background: linear-gradient(135deg, #2a1a1a, #4a2a1a); }
+    .portfolio-item:nth-child(3) .portfolio-thumb { background: linear-gradient(135deg, #1a1a2a, #2a1a4a); }
+
+    .portfolio-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10,10,10,0.95) 0%, transparent 60%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 40px;
+      transform: translateY(20px);
+      opacity: 0;
+      transition: all .4s;
+    }
+    .portfolio-item:hover .portfolio-overlay {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .portfolio-item:hover .portfolio-thumb { transform: scale(1.05); }
+
+    .portfolio-cat {
+      font-size: 11px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--or);
+      margin-bottom: 10px;
+    }
+    .portfolio-overlay h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .portfolio-overlay p {
+      font-size: 14px;
+      color: rgba(245,240,232,0.7);
+    }
+
+    /* Labels toujours visibles */
+    .portfolio-label {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 20px 24px;
+      background: linear-gradient(to top, rgba(10,10,10,0.8), transparent);
+    }
+    .portfolio-label h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+    }
+
+    /* ===== ÉQUIPE ===== */
+    #team {
+      background: #0e0e0e;
+      text-align: center;
+    }
+
+    .team-intro {
+      max-width: 600px;
+      margin: 0 auto 80px;
+    }
+    .team-intro p {
+      font-size: 17px;
+      color: rgba(245,240,232,0.65);
+      line-height: 1.7;
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 40px;
+    }
+
+    .team-card {
+      text-align: center;
+      transition: transform .3s;
+    }
+    .team-card:hover { transform: translateY(-8px); }
+
+    .team-avatar {
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      border: 2px solid rgba(200,169,110,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 52px;
+      background: var(--gris);
+      transition: border-color .3s;
+      overflow: hidden;
+    }
+    .team-card:hover .team-avatar { border-color: var(--or); }
+
+    .team-card h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      margin-bottom: 6px;
+    }
+    .team-role {
+      font-size: 13px;
+      color: var(--or);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .team-card p {
+      font-size: 14px;
+      color: rgba(245,240,232,0.55);
+      line-height: 1.6;
+    }
+
+    /* ===== TÉMOIGNAGES ===== */
+    #testimonials {
+      background: var(--blanc);
+      color: var(--noir);
+      overflow: hidden;
+    }
+
+    .testimonials-inner {
+      position: relative;
+    }
+
+    .testimonials-track {
+      display: flex;
+      gap: 40px;
+      transition: transform .6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .testimonial-card {
+      min-width: calc(50% - 20px);
+      background: white;
+      padding: 52px;
+      border-left: 4px solid var(--or);
+      flex-shrink: 0;
+    }
+
+    .testimonial-quote {
+      font-size: 48px;
+      color: var(--or);
+      font-family: 'Playfair Display', serif;
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+    .testimonial-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      line-height: 1.6;
+      color: #1a1a1a;
+      margin-bottom: 32px;
+      font-style: italic;
+    }
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .testimonial-avatar {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: var(--or);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .testimonial-name {
+      font-weight: 500;
+      font-size: 16px;
+      color: var(--noir);
+    }
+    .testimonial-company {
+      font-size: 13px;
+      color: #888;
+    }
+
+    .testimonials-nav {
+      display: flex;
+      gap: 12px;
+      margin-top: 40px;
+      justify-content: flex-end;
+    }
+    .t-nav-btn {
+      width: 48px; height: 48px;
+      border: 1px solid rgba(10,10,10,0.3);
+      background: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .3s;
+      color: var(--noir);
+    }
+    .t-nav-btn:hover { background: var(--or); border-color: var(--or); color: var(--noir); }
+
+    /* ===== TARIFS ===== */
+    #pricing { background: var(--gris); }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 60px;
+    }
+
+    .pricing-card {
+      border: 1px solid rgba(200,169,110,0.2);
+      padding: 52px 40px;
+      position: relative;
+      transition: all .3s;
+    }
+    .pricing-card:hover {
+      border-color: var(--or);
+      transform: translateY(-4px);
+    }
+    .pricing-card.featured {
+      background: var(--or);
+      color: var(--noir);
+      border-color: var(--or);
+    }
+    .pricing-badge {
+      position: absolute;
+      top: -14px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent);
+      color: white;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 6px 20px;
+    }
+    .pricing-plan {
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--or);
+      margin-bottom: 20px;
+    }
+    .pricing-card.featured .pricing-plan { color: var(--gris); }
+    .pricing-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 64px;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .pricing-period {
+      font-size: 14px;
+      color: rgba(245,240,232,0.5);
+      margin-bottom: 40px;
+    }
+    .pricing-card.featured .pricing-period { color: rgba(10,10,10,0.6); }
+    .pricing-features {
+      list-style: none;
+      margin-bottom: 40px;
+    }
+    .pricing-features li {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(200,169,110,0.15);
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .pricing-card.featured .pricing-features li { border-bottom-color: rgba(10,10,10,0.15); }
+    .pricing-features li::before {
+      content: '✓';
+      color: var(--or);
+      font-weight: 700;
+    }
+    .pricing-card.featured .pricing-features li::before { color: var(--gris); }
+    .pricing-features li.na { color: rgba(245,240,232,0.35); }
+    .pricing-features li.na::before { content: '–'; color: rgba(245,240,232,0.35); }
+
+    .btn-pricing {
+      width: 100%;
+      padding: 16px;
+      background: transparent;
+      border: 1px solid var(--or);
+      color: var(--or);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all .3s;
+      text-align: center;
+      display: block;
+      text-decoration: none;
+    }
+    .btn-pricing:hover { background: var(--or); color: var(--noir); }
+    .pricing-card.featured .btn-pricing {
+      background: var(--noir);
+      border-color: var(--noir);
+      color: var(--or);
+    }
+    .pricing-card.featured .btn-pricing:hover { background: var(--gris); }
+
+    /* ===== FAQ ===== */
+    #faq { background: #080808; }
+
+    .faq-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      margin-top: 60px;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid rgba(200,169,110,0.2);
+      padding-bottom: 28px;
+      margin-bottom: 28px;
+      cursor: pointer;
+    }
+    .faq-item:last-child { margin-bottom: 0; }
+    .faq-question {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .faq-question h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      line-height: 1.4;
+    }
+    .faq-toggle {
+      font-size: 24px;
+      color: var(--or);
+      flex-shrink: 0;
+      transition: transform .3s;
+    }
+    .faq-item.open .faq-toggle { transform: rotate(45deg); }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .4s ease, padding .3s;
+    }
+    .faq-item.open .faq-answer { max-height: 300px; padding-top: 16px; }
+    .faq-answer p {
+      font-size: 15px;
+      line-height: 1.7;
+      color: rgba(245,240,232,0.6);
+    }
+
+    /* ===== CONTACT ===== */
+    #contact {
+      background: var(--noir);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 100px;
+      align-items: start;
+    }
+
+    .contact-info h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(36px, 5vw, 60px);
+      line-height: 1.1;
+      margin-bottom: 28px;
+    }
+    .contact-info p {
+      font-size: 16px;
+      color: rgba(245,240,232,0.65);
+      line-height: 1.7;
+      margin-bottom: 48px;
+    }
+
+    .contact-detail {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+    .contact-icon {
+      width: 48px; height: 48px;
+      border: 1px solid rgba(200,169,110,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .contact-detail h4 {
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--or);
+      margin-bottom: 4px;
+    }
+    .contact-detail p {
+      font-size: 15px;
+      color: rgba(245,240,232,0.7);
+      margin: 0;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .form-group label {
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.5);
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(200,169,110,0.2);
+      color: var(--blanc);
+      padding: 16px 20px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      transition: border-color .3s;
+      outline: none;
+      resize: none;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus { border-color: var(--or); }
+    .form-group select option { background: var(--gris); }
+    .form-group textarea { min-height: 140px; }
+
+    .form-submit {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .form-note {
+      font-size: 13px;
+      color: rgba(245,240,232,0.4);
+    }
+
+    /* ===== CLIENTS LOGOS ===== */
+    .clients {
+      padding: 60px;
+      border-top: 1px solid rgba(200,169,110,0.15);
+      border-bottom: 1px solid rgba(200,169,110,0.15);
+    }
+    .clients-label {
+      text-align: center;
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.35);
+      margin-bottom: 40px;
+    }
+    .clients-logos {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 60px;
+      flex-wrap: wrap;
+    }
+    .client-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: rgba(245,240,232,0.2);
+      letter-spacing: 2px;
+      transition: color .3s;
+    }
+    .client-logo:hover { color: rgba(245,240,232,0.6); }
+
+    /* ===== FOOTER ===== */
+    footer {
+      background: var(--noir);
+      padding: 80px 60px 40px;
+      border-top: 1px solid rgba(200,169,110,0.15);
+    }
+    .footer-main {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 60px;
+      margin-bottom: 60px;
+    }
+    .footer-brand .logo { font-size: 30px; display: block; margin-bottom: 20px; }
+    .footer-brand p {
+      font-size: 15px;
+      color: rgba(245,240,232,0.5);
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+    .social-links {
+      display: flex;
+      gap: 12px;
+    }
+    .social-link {
+      width: 40px; height: 40px;
+      border: 1px solid rgba(200,169,110,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      text-decoration: none;
+      color: var(--blanc);
+      transition: all .3s;
+    }
+    .social-link:hover { background: var(--or); border-color: var(--or); color: var(--noir); }
+
+    .footer-col h5 {
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--or);
+      margin-bottom: 24px;
+    }
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .footer-links a {
+      color: rgba(245,240,232,0.5);
+      text-decoration: none;
+      font-size: 15px;
+      transition: color .3s;
+    }
+    .footer-links a:hover { color: var(--blanc); }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(200,169,110,0.1);
+      padding-top: 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-copy {
+      font-size: 13px;
+      color: rgba(245,240,232,0.3);
+    }
+    .footer-legal {
+      display: flex;
+      gap: 24px;
+    }
+    .footer-legal a {
+      font-size: 13px;
+      color: rgba(245,240,232,0.3);
+      text-decoration: none;
+      transition: color .3s;
+    }
+    .footer-legal a:hover { color: var(--or); }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    @keyframes scrollDrop {
+      0% { transform: scaleY(0); transform-origin: top; }
+      50% { transform: scaleY(1); transform-origin: top; }
+      50.001% { transform: scaleY(1); transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity .8s, transform .8s;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1100px) {
+      nav { padding: 20px 30px; }
+      nav.scrolled { padding: 14px 30px; }
+      section { padding: 80px 30px; }
+      .hero-stats { display: none; }
+      .team-grid { grid-template-columns: repeat(2, 1fr); }
+      #about { grid-template-columns: 1fr; gap: 60px; }
+      .about-visual { display: none; }
+    }
+
+    @media (max-width: 900px) {
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .services-grid { grid-template-columns: 1fr; }
+      .portfolio-grid { grid-template-columns: 1fr; }
+      .portfolio-item:first-child { grid-row: span 1; }
+      .portfolio-item:first-child .portfolio-thumb { aspect-ratio: 4/3; }
+      #contact { grid-template-columns: 1fr; gap: 60px; }
+      .form-row { grid-template-columns: 1fr; }
+      .footer-main { grid-template-columns: 1fr 1fr; }
+      .faq-grid { grid-template-columns: 1fr; gap: 0; }
+      .pricing-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      #hero { padding: 0 24px; }
+      section { padding: 60px 24px; }
+      nav { padding: 16px 24px; }
+      .footer-main { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 16px; }
+      .team-grid { grid-template-columns: 1fr 1fr; }
+      .testimonial-card { min-width: calc(90vw); }
+    }
+
+    /* ===== NOTIFICATION ===== */
+    .toast {
+      position: fixed;
+      bottom: 30px; right: 30px;
+      background: var(--or);
+      color: var(--noir);
+      padding: 16px 28px;
+      font-weight: 500;
+      font-size: 15px;
+      z-index: 9999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all .4s;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+  </style>
+</head>
+<body>
+
+<!-- Curseur -->
+<div id="cursor"></div>
+<div id="cursor-trail"></div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✓ Message envoyé avec succès !</div>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="close-menu" onclick="closeMenu()" aria-label="Fermer">×</button>
+  <a href="#about" onclick="closeMenu()">Studio</a>
+  <a href="#services" onclick="closeMenu()">Services</a>
+  <a href="#portfolio" onclick="closeMenu()">Réalisations</a>
+  <a href="#team" onclick="closeMenu()">Équipe</a>
+  <a href="#pricing" onclick="closeMenu()">Tarifs</a>
+  <a href="#contact" onclick="closeMenu()">Contact</a>
+</div>
+
+<!-- Navigation -->
+<nav id="navbar">
+  <a href="#hero" class="logo">Nexara<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="#about">Studio</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#portfolio">Réalisations</a></li>
+    <li><a href="#team">Équipe</a></li>
+    <li><a href="#pricing">Tarifs</a></li>
+    <li><a href="#contact" class="nav-cta">Démarrer un projet</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" onclick="openMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+
+  <div class="hero-content">
+    <div class="hero-tag">Studio de création numérique</div>
+    <h1 class="hero-title">Nous<br><em>façonnons</em><br>l'avenir<br>digital.</h1>
+    <p class="hero-desc">Nexara Studio conçoit des expériences numériques ambitieuses pour les marques qui refusent l'ordinaire. Design, stratégie, technologie — en harmonie.</p>
+    <div class="hero-actions">
+      <a href="#portfolio" class="btn-primary"><span>Voir nos projets</span></a>
+      <a href="#about" class="btn-outline">
+        Notre histoire
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num">147+</div>
+      <div class="hero-stat-label">Projets livrés</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">98%</div>
+      <div class="hero-stat-label">Satisfaction</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">12</div>
+      <div class="hero-stat-label">Années d'expertise</div>
+    </div>
+  </div>
+
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span>Défiler</span>
+  </div>
+</section>
+
+<!-- Ticker -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span class="ticker-item">Design d'interface</span><span class="ticker-dot">·</span>
+    <span class="ticker-item">Branding & Identité</span><span class="ticker-dot">·</span>
+    <span class="ticker-item">Développement web</span><span class="ticker-dot">·</span>
+    <span class="ticker-item">Stratégie digitale</span><span class="ticker-dot">·</span>
+    <span class="ticker-item">Applications mobiles</span><span class="ticker-dot">·</span>
+    <span class="ticker-item">Motion design</span><span class="ticker-dot">·</span>
+    <span class="ticker-item">Design d'interface</span><span class="ticker-dot">·</span>
+    <span class="ticker-item">Branding & Identité</span><span class="ticker-dot">·</span>
+    <span class="ticker-item">Développement web</span><span class="ticker-dot">·</span>
+    <span class="ticker-item">Stratégie digitale</span><span class="ticker-dot">·</span>
+    <span class="ticker-item">Applications mobiles</span><span class="ticker-dot">·</span>
+    <span class="ticker-item">Motion design</span><span class="ticker-dot">·</span>
+  </div>
+</div>
+
+<!-- ===== À PROPOS ===== -->
+<section id="about">
+  <div class="about-visual reveal">
+    <div class="about-visual-main">
+      <div class="about-photo-placeholder">N</div>
+    </div>
+    <div class="about-visual-accent">
+      <div class="about-years">
+        <div class="about-years-num">12</div>
+        <div class="about-years-label">ans d'excellence</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="about-text reveal">
+    <div class="section-tag">Notre histoire</div>
+    <h2 class="section-title">Un studio né pour l'excellence</h2>
+    <p>Fondé en 2012 à Paris par Clara Moreau et Julien Tessier, Nexara Studio a émergé de la conviction que le design numérique mérite la même rigueur et la même ambition que les disciplines artistiques traditionnelles.</p>
+    <p>Aujourd'hui, notre équipe de 22 experts répartis entre Paris, Lyon et Bordeaux accompagne des startups innovantes et des grands groupes dans la transformation de leur présence numérique.</p>
+
+    <div class="about-values">
+      <div class="about-value">
+        <div class="about-value-icon">◈</div>
+        <h4>Précision</h4>
+        <p>Chaque pixel compte. Nous travaillons avec une attention maniaque aux détails.</p>
+      </div>
+      <div class="about-value">
+        <div class="about-value-icon">◉</div>
+        <h4>Audace</h4>
+        <p>Nous aimons les briefs qui défient les conventions et bousculent les standards.</p>
+      </div>
+      <div class="about-value">
+        <div class="about-value-icon">◇</div>
+        <h4>Pérennité</h4>
+        <p>Nous créons des expériences qui durent et qui évoluent avec vos ambitions.</p>
+      </div>
+      <div class="about-value">
+        <div class="about-value-icon">◈</div>
+        <h4>Transparence</h4>
+        <p>Une relation de confiance, des livrables clairs, des délais tenus.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Logos clients -->
+<div class="clients">
+  <p class="clients-label">Ils nous font confiance</p>
+  <div class="clients-logos">
+    <div class="client-logo">LUMORA</div>
+    <div class="client-logo">VERITAS</div>
+    <div class="client-logo">HELION</div>
+    <div class="client-logo">ARCANE</div>
+    <div class="client-logo">SOLARIS</div>
+    <div class="client-logo">OPTIKA</div>
+  </div>
+</div>
+
+<!-- ===== SERVICES ===== -->
+<section id="services">
+  <div class="services-header reveal">
+    <div>
+      <div class="section-tag">Ce que nous faisons</div>
+      <h2 class="section-title">Notre expertise<br>à votre service</h2>
+    </div>
+    <a href="#contact" class="btn-outline" style="color: rgba(245,240,232,0.7);">
+      Voir tous les services
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </div>
+
+  <div class="services-grid">
+    <div class="service-card reveal">
+      <div class="service-num">01</div>
+      <div class="service-icon">✦</div>
+      <h3>Design d'expérience</h3>
+      <p>Nous concevons des interfaces qui enchantent vos utilisateurs, de la recherche UX aux maquettes haute fidélité et aux prototypes interactifs.</p>
+      <div class="service-tags">
+        <span class="service-tag">UX Research</span>
+        <span class="service-tag">UI Design</span>
+        <span class="service-tag">Prototypage</span>
+      </div>
+    </div>
+
+    <div class="service-card reveal">
+      <div class="service-num">02</div>
+      <div class="service-icon">◈</div>
+      <h3>Branding & Identité</h3>
+      <p>Votre marque mérite une identité forte et cohérente. Nous créons des systèmes visuels mémorables qui traversent le temps et les supports.</p>
+      <div class="service-tags">
+        <span class="service-tag">Logo</span>
+        <span class="service-tag">Charte graphique</span>
+        <span class="service-tag">Brand Voice</span>
+      </div>
+    </div>
+
+    <div class="service-card reveal">
+      <div class="service-num">03</div>
+      <div class="service-icon">⬡</div>
+      <h3>Développement web</h3>
+      <p>Des sites et applications web performants, accessibles et optimisés. Du front-end au back-end, nous maîtrisons l'ensemble de la chaîne technique.</p>
+      <div class="service-tags">
+        <span class="service-tag">React / Next.js</span>
+        <span class="service-tag">Node.js</span>
+        <span class="service-tag">CMS</span>
+      </div>
+    </div>
+
+    <div class="service-card reveal">
+      <div class="service-num">04</div>
+      <div class="service-icon">◉</div>
+      <h3>Stratégie digitale</h3>
+      <p>Audit complet de votre présence numérique, définition de roadmap et accompagnement dans la transformation digitale de votre organisation.</p>
+      <div class="service-tags">
+        <span class="service-tag">Audit digital</span>
+        <span class="service-tag">Roadmap</span>
+        <span class="service-tag">Analytics</span>
+      </div>
+    </div>
+
+    <div class="service-card reveal">
+      <div class="service-num">05</div>
+      <div class="service-icon">▷</div>
+      <h3>Motion design</h3>
+      <p>L'animation comme langage. Nous donnons vie à vos interfaces et créons des vidéos de marque qui captivent et convertissent.</p>
+      <div class="service-tags">
+        <span class="service-tag">After Effects</span>
+        <span class="service-tag">Lottie</span>
+        <span class="service-tag">3D</span>
+      </div>
+    </div>
+
+    <div class="service-card reveal">
+      <div class="service-num">06</div>
+      <div class="service-icon">◇</div>
+      <h3>Applications mobiles</h3>
+      <p>Des applications iOS et Android natives ou cross-platform qui offrent une expérience irréprochable et s'adaptent aux comportements de vos utilisateurs.</p>
+      <div class="service-tags">
+        <span class="service-tag">React Native</span>
+        <span class="service-tag">Flutter</span>
+        <span class="service-tag">Swift</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PORTFOLIO ===== -->
+<section id="portfolio">
+  <div class="portfolio-header reveal">
+    <div>
+      <div class="section-tag">Nos réalisations</div>
+      <h2 class="section-title">Des projets qui<br>parlent d'eux-mêmes</h2>
+    </div>
+    <a href="#contact" class="btn-outline">
+      Tous les projets
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </div>
+
+  <div class="portfolio-grid reveal">
+    <div class="portfolio-item">
+      <div class="portfolio-thumb">🌿</div>
+      <div class="portfolio-overlay">
+        <div class="portfolio-cat">Branding — Digital</div>
+        <h3>Lumora Cosmetics</h3>
+        <p>Refonte complète de l'identité visuelle et du site e-commerce pour cette marque de cosmétiques naturels haut de gamme.</p>
+      </div>
+    </div>
+
+    <div class="portfolio-item">
+      <div class="portfolio-thumb">🏛️</div>
+      <div class="portfolio-overlay">
+        <div class="portfolio-cat">UX Design — Web App</div>
+        <h3>Veritas Finance</h3>
+        <p>Plateforme de gestion d'investissements B2B avec tableau de bord analytique avancé.</p>
+      </div>
+    </div>
+
+    <div class="portfolio-item">
+      <div class="portfolio-thumb">🚀</div>
+      <div class="portfolio-overlay">
+        <div class="portfolio-cat">Mobile App — iOS/Android</div>
+        <h3>Helion Mobility</h3>
+        <p>Application de mobilité urbaine pour 50 000 utilisateurs actifs dans 3 villes françaises.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ÉQUIPE ===== -->
+<section id="team">
+  <div class="section-tag" style="justify-content: center;">Notre équipe</div>
+  <h2 class="section-title reveal">Les visages<br>derrière la magie</h2>
+
+  <div class="team-intro reveal">
+    <p>22 passionnés rassemblés par la conviction que le bon design change les entreprises et améliore la vie des gens. Curieux, ambitieux et profondément humains.</p>
+  </div>
+
+  <div class="team-grid">
+    <div class="team-card reveal">
+      <div class="team-avatar">👩‍💼</div>
+      <h4>Clara Moreau</h4>
+      <div class="team-role">Fondatrice & CEO</div>
+      <p>Ancienne directrice artistique chez BETC, Clara a fondé Nexara avec la vision d'un studio à part entière.</p>
+    </div>
+
+    <div class="team-card reveal">
+      <div class="team-avatar">👨‍💻</div>
+      <h4>Julien Tessier</h4>
+      <div class="team-role">Co-fondateur & CTO</div>
+      <p>Ingénieur de formation, Julien a travaillé 5 ans chez Google avant de rejoindre Clara dans cette aventure.</p>
+    </div>
+
+    <div class="team-card reveal">
+      <div class="team-avatar">👩‍🎨</div>
+      <h4>Amara Diallo</h4>
+      <div class="team-role">Directrice créative</div>
+      <p>Formée aux Beaux-Arts de Paris, Amara apporte une sensibilité artistique rare au monde du digital.</p>
+    </div>
+
+    <div class="team-card reveal">
+      <div class="team-avatar">👨‍🔬</div>
+      <h4>Lucas Chen</h4>
+      <div class="team-role">Lead UX Researcher</div>
+      <p>Psychologue cognitif reconverti au design, Lucas place toujours l'humain au cœur de chaque projet.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TÉMOIGNAGES ===== -->
+<section id="testimonials">
+  <div class="section-tag" style="color: var(--gris-clair);">Ce qu'ils disent</div>
+  <h2 class="section-title reveal" style="color: var(--noir);">La parole<br>à nos clients</h2>
+
+  <div class="testimonials-inner reveal">
+    <div style="overflow: hidden;">
+      <div class="testimonials-track" id="testimonialTrack">
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"</div>
+          <p class="testimonial-text">Nexara a transformé notre image de marque de fond en comble. Le résultat dépasse tout ce que nous espérions : nos ventes ont augmenté de 34% depuis le lancement.</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">🌟</div>
+            <div>
+              <div class="testimonial-name">Sophie Bertrand</div>
+              <div class="testimonial-company">PDG, Lumora Cosmetics</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"</div>
+          <p class="testimonial-text">Un studio qui comprend vraiment les enjeux business. Ils ne font pas que du beau — ils font du beau qui performe. Notre taux de conversion a doublé.</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">💎</div>
+            <div>
+              <div class="testimonial-name">Marc Dubois</div>
+              <div class="testimonial-company">Directeur Marketing, Veritas Finance</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"</div>
+          <p class="testimonial-text">L'équipe de Nexara fait preuve d'une rigueur et d'une créativité exceptionnelles. Ce qui nous a le plus impressionné, c'est leur capacité à challenger nos idées.</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">🚀</div>
+            <div>
+              <div class="testimonial-name">Élodie Martin</div>
+              <div class="testimonial-company">CEO, Helion Mobility</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-quote">"</div>
+          <p class="testimonial-text">Travailler avec Nexara, c'est avoir une équipe aussi investie dans votre succès que vous l'êtes vous-même. Une collaboration au-delà de la prestation.</p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">⚡</div>
+            <div>
+              <div class="testimonial-name">Thomas Renard</div>
+              <div class="testimonial-company">Fondateur, Arcane Labs</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonials-nav">
+      <button class="t-nav-btn" onclick="moveTestimonials(-1)" aria-label="Précédent">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M10 4L6 8l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button class="t-nav-btn" onclick="moveTestimonials(1)" aria-label="Suivant">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TARIFS ===== -->
+<section id="pricing">
+  <div class="reveal" style="text-align: center;">
+    <div class="section-tag" style="justify-content: center;">Nos offres</div>
+    <h2 class="section-title">Investissez dans<br>votre excellence</h2>
+    <p style="color: rgba(245,240,232,0.6); font-size: 17px; max-width: 500px; margin: 0 auto;">Des formules claires, sans surprise. Chaque projet mérite l'accompagnement qui lui convient.</p>
+  </div>
+
+  <div class="pricing-grid reveal">
+    <div class="pricing-card">
+      <div class="pricing-plan">Essentiel</div>
+      <div class="pricing-price">3 500€</div>
+      <div class="pricing-period">par projet · livraison 3 semaines</div>
+      <ul class="pricing-features">
+        <li>Charte graphique complète</li>
+        <li>Site vitrine (5 pages)</li>
+        <li>Design responsive</li>
+        <li>Intégration CMS</li>
+        <li>1 mois de support</li>
+        <li class="na">Application mobile</li>
+        <li class="na">Stratégie de marque</li>
+      </ul>
+      <a href="#contact" class="btn-pricing">Démarrer</a>
+    </div>
+
+    <div class="pricing-card featured">
+      <div class="pricing-badge">Le plus populaire</div>
+      <div class="pricing-plan">Studio</div>
+      <div class="pricing-price">8 900€</div>
+      <div class="pricing-period">par projet · livraison 6 semaines</div>
+      <ul class="pricing-features">
+        <li>Identité de marque complète</li>
+        <li>Site ou app web sur-mesure</li>
+        <li>UX Research approfondie</li>
+        <li>Animations & interactions</li>
+        <li>3 mois de support</li>
+        <li>Tableau de bord analytics</li>
+        <li class="na">Application mobile native</li>
+      </ul>
+      <a href="#contact" class="btn-pricing">Démarrer</a>
+    </div>
+
+    <div class="pricing-card">
+      <div class="pricing-plan">Signature</div>
+      <div class="pricing-price">Sur devis</div>
+      <div class="pricing-period">engagement sur-mesure</div>
+      <ul class="pricing-features">
+        <li>Tout l'offre Studio</li>
+        <li>Application mobile iOS/Android</li>
+        <li>Direction artistique annuelle</li>
+        <li>Équipe dédiée</li>
+        <li>Support 24/7 prioritaire</li>
+        <li>Retainer mensuel disponible</li>
+        <li>Accompagnement stratégique</li>
+      </ul>
+      <a href="#contact" class="btn-pricing">Nous contacter</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section id="faq">
+  <div class="section-tag reveal">Questions fréquentes</div>
+  <h2 class="section-title reveal">Tout savoir avant<br>de se lancer</h2>
+
+  <div class="faq-grid reveal">
+    <div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-question">
+          <h4>Comment se déroule un projet chez Nexara ?</h4>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>Chaque projet suit notre méthodologie en 5 étapes : découverte (1 semaine), définition stratégique, conception, développement et lancement. Vous êtes impliqué à chaque étape clé avec des points hebdomadaires et un accès à nos outils de suivi en temps réel.</p>
+        </div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-question">
+          <h4>Combien de temps dure un projet en moyenne ?</h4>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>Un site vitrine prend généralement 3 à 4 semaines. Une application web complète ou une refonte de marque demande 6 à 12 semaines. Nous établissons un calendrier précis dès la phase de devis.</p>
+        </div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-question">
+          <h4>Travaillez-vous avec des startups early-stage ?</h4>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>Absolument ! Nous adorons accompagner les startups dès leurs débuts. Nous proposons une formule Essentiel adaptée aux budgets early-stage, avec la même qualité d'exécution que pour nos clients grands comptes.</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-question">
+          <h4>Que se passe-t-il après la livraison du projet ?</h4>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>Tous nos projets incluent une période de support (1 à 6 mois selon la formule). Nous proposons également des contrats de maintenance et d'évolution continue pour les clients qui souhaitent un accompagnement sur le long terme.</p>
+        </div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-question">
+          <h4>Intervenez-vous sur des projets internationaux ?</h4>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>Oui, nous avons l'habitude de travailler avec des clients en Europe, au Canada et aux États-Unis. Notre équipe est bilingue français-anglais et nous adaptons nos processus aux fuseaux horaires.</p>
+        </div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-question">
+          <h4>Comment sont structurés les paiements ?</h4>
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>Nous appliquons un acompte de 40% au démarrage, 40% à la validation des maquettes, et 20% à la livraison finale. Pour les projets longs, nous pouvons proposer un échelonnement mensuel.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CONTACT ===== -->
+<section id="contact">
+  <div class="contact-info reveal">
+    <div class="section-tag">Travaillons ensemble</div>
+    <h2 class="contact-info h2">Prêt à créer quelque chose d'exceptionnel ?</h2>
+    <p>Chaque grand projet commence par une conversation. Parlez-nous de vos ambitions — nous vous dirons comment les transformer en réalité.</p>
+
+    <div class="contact-detail">
+      <div class="contact-icon">✉</div>
+      <div>
+        <h4>Email</h4>
+        <p>hello@nexara-studio.fr</p>
+      </div>
+    </div>
+
+    <div class="contact-detail">
+      <div class="contact-icon">☎</div>
+      <div>
+        <h4>Téléphone</h4>
+        <p>+33 1 42 58 96 12</p>
+      </div>
+    </div>
+
+    <div class="contact-detail">
+      <div class="contact-icon">◎</div>
+      <div>
+        <h4>Adresse</h4>
+        <p>14 rue des Arts, 75004 Paris<br>Lun–Ven, 9h–18h</p>
+      </div>
+    </div>
+
+    <div class="contact-detail">
+      <div class="contact-icon">⌛</div>
+      <div>
+        <h4>Délai de réponse</h4>
+        <p>Sous 24h ouvrées garanties</p>
+      </div>
+    </div>
+  </div>
+
+  <form class="contact-form reveal" onsubmit="handleSubmit(event)">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="fname">Prénom</label>
+        <input type="text" id="fname" placeholder="Jean" required>
+      </div>
+      <div class="form-group">
+        <label for="lname">Nom</label>
+        <input type="text" id="lname" placeholder="Dupont" required>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email professionnel</label>
+      <input type="email" id="email" placeholder="jean@entreprise.fr" required>
+    </div>
+
+    <div class="form-group">
+      <label for="company">Entreprise</label>
+      <input type="text" id="company" placeholder="Nom de votre entreprise">
+    </div>
+
+    <div class="form-group">
+      <label for="service">Type de projet</label>
+      <select id="service">
+        <option value="" disabled selected>Sélectionnez un service</option>
+        <option>Design d'expérience / UX-UI</option>
+        <option>Branding & Identité visuelle</option>
+        <option>Développement web</option>
+        <option>Application mobile</option>
+        <option>Stratégie digitale</option>
+        <option>Autre / À définir</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="budget">Budget approximatif</label>
+      <select id="budget">
+        <option value="" disabled selected>Votre budget</option>
+        <option>< 5 000 €</option>
+        <option>5 000 – 15 000 €</option>
+        <option>15 000 – 50 000 €</option>
+        <option>> 50 000 €</option>
+        <option>À définir ensemble</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="message">Parlez-nous de votre projet</label>
+      <textarea id="message" placeholder="Décrivez votre projet, vos objectifs, vos contraintes..." required></textarea>
+    </div>
+
+    <div class="form-submit">
+      <span class="form-note">Réponse sous 24h ouvrées</span>
+      <button type="submit" class="btn-primary"><span>Envoyer le message</span></button>
+    </div>
+  </form>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-main">
+    <div class="footer-brand">
+      <a href="#hero" class="logo">Nexara<span>.</span></a>
+      <p>Studio de design et d'innovation numérique basé à Paris. Nous créons des expériences digitales qui transforment les marques et captivent les utilisateurs.</p>
+      <div class="social-links">
+        <a href="#" class="social-link" title="LinkedIn">in</a>
+        <a href="#" class="social-link" title="Instagram">ig</a>
+        <a href="#" class="social-link" title="Dribbble">dr</a>
+        <a href="#" class="social-link" title="Behance">be</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h5>Services</h5>
+      <ul class="footer-links">
+        <li><a href="#services">Design UX/UI</a></li>
+        <li><a href="#services">Branding</a></li>
+        <li><a href="#services">Développement</a></li>
+        <li><a href="#services">Stratégie</a></li>
+        <li><a href="#services">Motion design</a></li>
+        <li><a href="#services">App mobile</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h5>Studio</h5>
+      <ul class="footer-links">
+        <li><a href="#about">Notre histoire</a></li>
+        <li><a href="#team">L'équipe</a></li>
+        <li><a href="#portfolio">Réalisations</a></li>
+        <li><a href="#testimonials">Témoignages</a></li>
+        <li><a href="#pricing">Tarifs</a></li>
+        <li><a href="#">Blog</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h5>Contact</h5>
+      <ul class="footer-links">
+        <li><a href="mailto:hello@nexara-studio.fr">hello@nexara-studio.fr</a></li>
+        <li><a href="tel:+33142589612">+33 1 42 58 96 12</a></li>
+        <li><a href="#">14 rue des Arts</a></li>
+        <li><a href="#">75004 Paris</a></li>
+        <li><a href="#">Lun–Ven 9h–18h</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2024 Nexara Studio SAS — Tous droits réservés</div>
+    <div class="footer-legal">
+      <a href="#">Mentions légales</a>
+      <a href="#">Politique de confidentialité</a>
+      <a href="#">CGV</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ===== CURSEUR =====
+  const cursor = document.getElementById('cursor');
+  const trail = document.getElementById('cursor-trail');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+    trail.style.left = e.clientX + 'px';
+    trail.style.top = e.clientY + 'px';
+  });
+  document.querySelectorAll('a, button, .service-card, .portfolio-item, .team-card').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '20px';
+      cursor.style.height = '20px';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '12px';
+      cursor.style.height = '12px';
+    });
+  });
+
+  // ===== NAV SCROLL =====
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // ===== MOBILE MENU =====
+  function openMenu() {
+    document.getElementById('mobileMenu').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeMenu() {
+    document.getElementById('mobileMenu').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ===== REVEAL ON SCROLL =====
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+  reveals.forEach(el => observer.observe(el));
+
+  // ===== TÉMOIGNAGES SLIDER =====
+  let tPos = 0;
+  function moveTestimonials(dir) {
+    const track = document.getElementById('testimonialTrack');
+    const cards = track.children.length;
+    tPos = Math.max(0, Math.min(tPos + dir, cards - 2));
+    const w = track.children[0].offsetWidth + 40;
+    track.style.transform = `translateX(-${tPos * w}px)`;
+  }
+
+  // ===== FAQ =====
+  function toggleFaq(item) {
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  }
+
+  // ===== FORM SUBMIT =====
+  function handleSubmit(e) {
+    e.preventDefault();
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    e.target.reset();
+    setTimeout(() => toast.classList.remove('show'), 4000);
+  }
+
+  // ===== COMPTEURS HERO =====
+  function animateCounter(el, target, suffix = '') {
+    let current = 0;
+    const step = target / 60;
+    const update = () => {
+      current = Math.min(current + step, target);
+      el.textContent = Math.floor(current) + suffix;
+      if (current < target) requestAnimationFrame(update);
+    };
+    update();
+  }
+  setTimeout(() => {
+    document.querySelectorAll('.hero-stat-num').forEach(el => {
+      const text = el.textContent;
+      const num = parseInt(text);
+      const suffix = text.replace(num.toString(), '');
+      animateCounter(el, num, suffix);
+    });
+  }, 1200);
+
+  // ===== SMOOTH ACTIVE NAV =====
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 200) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.style.color = a.getAttribute('href') === '#' + current
+        ? 'var(--or)'
+        : 'rgba(245,240,232,0.7)';
+    });
+  }, { passive: true });
+</script>
+</body>
+</html>
